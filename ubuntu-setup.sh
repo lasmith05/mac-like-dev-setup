@@ -6,6 +6,31 @@ set -e  # Exit on any error
 
 echo "🚀 Setting up Ubuntu Development Environment..."
 
+# Function to check if command exists
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+# Function to verify file exists and is readable
+verify_file() {
+    if [ -f "$1" ] && [ -r "$1" ]; then
+        echo "✅ $1 exists and is readable"
+        return 0
+    else
+        echo "❌ $1 is missing or not readable"
+        return 1
+    fi
+}
+
+# Check if we're in WSL
+if ! grep -q Microsoft /proc/version 2>/dev/null; then
+    echo "⚠️  This script is designed for WSL. Continue anyway? (y/n)"
+    read -r response
+    if [[ ! "$response" =~ ^[Yy]$ ]]; then
+        exit 1
+    fi
+fi
+
 # Update system
 echo "📦 Updating system packages..."
 sudo apt update && sudo apt upgrade -y
@@ -69,21 +94,34 @@ if ! command -v rustc &> /dev/null; then
     source ~/.cargo/env
 fi
 
-# Set up dotfiles
+# Set up dotfiles with proper line endings
 echo "📝 Setting up dotfiles..."
 
-# Only copy dotfiles if they don't exist (don't overwrite existing configs)
-if [ ! -f "$HOME/.tmux.conf" ]; then
-    cp .tmux.conf ~/.tmux.conf 2>/dev/null || echo "⚠️  .tmux.conf not found - will need to be created manually"
-fi
+# Function to create dotfile with Unix line endings
+create_dotfile() {
+    local file="$1"
+    local source_file="$2"
+    
+    if [ -f "$source_file" ]; then
+        echo "📄 Processing $file..."
+        # Remove Windows line endings and copy
+        tr -d '\r' < "$source_file" > "$file"
+        echo "✅ $file created with Unix line endings"
+    else
+        echo "⚠️  $source_file not found, skipping $file"
+    fi
+}
 
-if [ ! -f "$HOME/.zshrc.custom" ]; then
-    cp .zshrc.custom ~/.zshrc.custom 2>/dev/null || echo "⚠️  .zshrc.custom not found - will need to be created manually"
-fi
+# Create dotfiles with proper line endings
+create_dotfile ~/.tmux.conf .tmux.conf
+create_dotfile ~/.vimrc .vimrc
+create_dotfile ~/.zshrc.custom .zshrc.custom
 
-if [ ! -f "$HOME/.vimrc" ]; then
-    cp .vimrc ~/.vimrc 2>/dev/null || echo "⚠️  .vimrc not found - will need to be created manually"
-fi
+# Verify dotfiles were created
+echo "🔍 Verifying dotfiles..."
+verify_file ~/.tmux.conf || echo "⚠️  .tmux.conf not created"
+verify_file ~/.vimrc || echo "⚠️  .vimrc not created"
+verify_file ~/.zshrc.custom || echo "⚠️  .zshrc.custom not created"
 
 # Add custom zsh config to .zshrc
 if [ -f "$HOME/.zshrc.custom" ]; then
@@ -109,19 +147,60 @@ fi
 echo ""
 echo "🎉 Ubuntu development environment setup complete!"
 echo ""
-echo "📋 Next steps:"
-echo "1. Exit and restart your terminal to use zsh"
-echo "2. In tmux, press Ctrl+b then I to install plugins (if not already done)"
-echo "3. Test your new tools:"
-echo "   - ls (should show eza with colors)"
-echo "   - ll (should show detailed listing)"
-echo "   - cat ~/.zshrc (should show syntax highlighting)"
-echo "   - tmux (should start with all plugins)"
+echo "🔍 Final verification:"
+
+# Verify installations
+echo "📦 Checking installed packages..."
+command_exists tmux && echo "✅ tmux installed" || echo "❌ tmux missing"
+command_exists zsh && echo "✅ zsh installed" || echo "❌ zsh missing"
+command_exists git && echo "✅ git installed" || echo "❌ git missing"
+command_exists eza && echo "✅ eza installed" || echo "❌ eza missing"
+command_exists bat && echo "✅ bat installed" || echo "❌ bat missing"
+command_exists rg && echo "✅ ripgrep installed" || echo "❌ ripgrep missing"
+command_exists fd && echo "✅ fd installed" || echo "❌ fd missing"
+command_exists fzf && echo "✅ fzf installed" || echo "❌ fzf missing"
+
+# Verify dotfiles
 echo ""
-echo "🛠️  Manual steps needed:"
-echo "1. Install Claude Code from Anthropic's documentation"
-echo "2. Configure VS Code extensions"
-echo "3. Set up your Git credentials: git config --global user.name 'Your Name'"
-echo "                                git config --global user.email 'your.email@example.com'"
+echo "📄 Checking dotfiles..."
+verify_file ~/.tmux.conf
+verify_file ~/.vimrc
+verify_file ~/.zshrc.custom
+
+# Check if Oh My Zsh is installed
+if [ -d "$HOME/.oh-my-zsh" ]; then
+    echo "✅ Oh My Zsh installed"
+else
+    echo "❌ Oh My Zsh missing"
+fi
+
+# Check if TPM is installed
+if [ -d "$HOME/.tmux/plugins/tpm" ]; then
+    echo "✅ Tmux Plugin Manager installed"
+else
+    echo "❌ Tmux Plugin Manager missing"
+fi
+
+# Check if custom config is loaded in .zshrc
+if grep -q "source ~/.zshrc.custom" ~/.zshrc 2>/dev/null; then
+    echo "✅ Custom zsh config is linked"
+else
+    echo "⚠️  Custom zsh config not linked in .zshrc"
+fi
+
+echo ""
+echo "📋 Next steps:"
+echo "1. 🔄 Restart your terminal to use zsh as default shell"
+echo "2. 🔌 Open tmux and press Ctrl+a then I to install plugins"
+echo "3. 🔧 Configure Git credentials:"
+echo "   git config --global user.name 'Your Name'"
+echo "   git config --global user.email 'your.email@example.com'"
+echo "4. 🧪 Test your setup:"
+echo "   ls    # Should show colorful output with icons"
+echo "   cat ~/.bashrc  # Should show syntax highlighting"
+echo "   tmux  # Should start with mouse support"
+echo ""
+echo "🛠️  If any items show ❌, you may need to run parts of the setup manually."
+echo "🎯  For issues, check the GitHub repository README for troubleshooting."
 echo ""
 echo "Enjoy your new Mac-like development environment! 🚀"

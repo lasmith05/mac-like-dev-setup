@@ -10,6 +10,15 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
     exit 1
 }
 
+# Set execution policy to allow scripts to run
+Write-Host "Setting PowerShell execution policy..." -ForegroundColor Yellow
+try {
+    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+    Write-Host "✅ PowerShell execution policy set successfully" -ForegroundColor Green
+} catch {
+    Write-Host "⚠️  Could not set execution policy: $($_.Exception.Message)" -ForegroundColor Yellow
+}
+
 # Install WSL2 with Ubuntu 24.04 LTS
 Write-Host "Installing WSL2 with Ubuntu 24.04 LTS..." -ForegroundColor Yellow
 wsl --install -d Ubuntu-24.04
@@ -50,6 +59,13 @@ Write-Host ""
 Write-Host "Windows setup complete!" -ForegroundColor Green
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "1. Restart your computer to complete WSL installation" -ForegroundColor White
-Write-Host "2. Open Windows Terminal and run: wsl" -ForegroundColor White
-Write-Host "3. Run the Ubuntu setup script in WSL" -ForegroundColor White
-Write-Host "4. Download your dotfiles and ubuntu-setup.sh to your WSL home directory" -ForegroundColor White
+Write-Host "2. After restart, open Windows Terminal" -ForegroundColor White
+Write-Host "3. Type 'wsl' to enter Ubuntu" -ForegroundColor White
+Write-Host "4. Run these commands in Ubuntu:" -ForegroundColor White
+Write-Host "   cd ~" -ForegroundColor Cyan
+Write-Host "   cp /mnt/c/$(Split-Path -Leaf $PWD)/* ." -ForegroundColor Cyan
+Write-Host "   chmod +x ubuntu-setup.sh" -ForegroundColor Cyan
+Write-Host "   ./ubuntu-setup.sh" -ForegroundColor Cyan
+Write-Host ""
+Write-Host "📁 Current setup folder: $PWD" -ForegroundColor Yellow
+Write-Host "💾 Remember this path for the Ubuntu setup step!" -ForegroundColor Yellow
