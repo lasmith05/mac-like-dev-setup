@@ -16,11 +16,27 @@ Create a new folder and download these files:
 ### 2. Run Windows Setup
 
 1. **Run PowerShell as Administrator**
-2. Navigate to your setup folder
-3. Run the Windows setup script:
+   - Right-click on PowerShell in Start menu
+   - Select "Run as Administrator"
+2. **Navigate to your setup folder**:
+   ```powershell
+   cd C:\path\to\your\setup\folder
+   ```
+3. **Run the Windows setup script**:
    ```powershell
    .\windows-setup.ps1
    ```
+
+**If you get an execution policy error**, try one of these solutions:
+- **Solution 1 (Recommended)**: Make sure you're running as Administrator (the script handles this automatically)
+- **Solution 2**: Set execution policy manually:
+  ```powershell
+  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
+  ```
+- **Solution 3**: Bypass policy for single execution:
+  ```powershell
+  PowerShell -ExecutionPolicy Bypass -File .\windows-setup.ps1
+  ```
 
 This will install:
 - WSL 2 with Ubuntu 24.04 LTS
@@ -183,6 +199,12 @@ set -g @plugin 'plugin-name'
 ```
 
 ## 🆘 Troubleshooting
+
+### PowerShell Execution Policy Error
+If you get "running scripts is disabled" error:
+- **Make sure you're running PowerShell as Administrator** (recommended)
+- Or run: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force`
+- Or bypass for single use: `PowerShell -ExecutionPolicy Bypass -File .\windows-setup.ps1`
 
 ### WSL Installation Issues
 - Ensure virtualization is enabled in BIOS
