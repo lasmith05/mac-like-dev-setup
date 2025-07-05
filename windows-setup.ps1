@@ -14,9 +14,9 @@ if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdent
 Write-Host "Setting PowerShell execution policy..." -ForegroundColor Yellow
 try {
     Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-    Write-Host "✅ PowerShell execution policy set successfully" -ForegroundColor Green
+    Write-Host "PowerShell execution policy set successfully" -ForegroundColor Green
 } catch {
-    Write-Host "⚠️  Could not set execution policy: $($_.Exception.Message)" -ForegroundColor Yellow
+    Write-Host "Warning: Could not set execution policy: $($_.Exception.Message)" -ForegroundColor Yellow
 }
 
 # Install WSL2 with Ubuntu 24.04 LTS
@@ -67,5 +67,5 @@ Write-Host "   cp /mnt/c/$(Split-Path -Leaf $PWD)/* ." -ForegroundColor Cyan
 Write-Host "   chmod +x ubuntu-setup.sh" -ForegroundColor Cyan
 Write-Host "   ./ubuntu-setup.sh" -ForegroundColor Cyan
 Write-Host ""
-Write-Host "📁 Current setup folder: $PWD" -ForegroundColor Yellow
-Write-Host "💾 Remember this path for the Ubuntu setup step!" -ForegroundColor Yellow
+Write-Host "Current setup folder: $PWD" -ForegroundColor Yellow
+Write-Host "Remember this path for the Ubuntu setup step!" -ForegroundColor Yellow
