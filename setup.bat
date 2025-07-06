@@ -25,16 +25,37 @@ if %errorLevel% == 0 (
 )
 
 echo.
-echo [INFO] Setting PowerShell execution policy...
+echo [INFO] Preparing PowerShell environment...
 
-REM Set PowerShell execution policy to allow script execution
-powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force" >nul 2>&1
+REM Check PowerShell version
+echo [INFO] Checking PowerShell version...
+powershell -Command "if ($PSVersionTable.PSVersion.Major -lt 5) { Write-Host '[ERROR] PowerShell 5.1 or higher required' -ForegroundColor Red; exit 1 }" 2>nul
+if %errorLevel% neq 0 (
+    echo [ERROR] PowerShell 5.1 or higher is required for this script
+    echo [INFO] Please update PowerShell and try again
+    pause
+    exit /b 1
+)
+
+REM Unblock the PowerShell script file (prevents "not digitally signed" errors)
+echo [INFO] Unblocking PowerShell script file...
+powershell -Command "Unblock-File '%~dp0windows-setup.ps1'" 2>nul
+if %errorLevel% == 0 (
+    echo [INFO] PowerShell script unblocked successfully
+) else (
+    echo [WARNING] Could not unblock script file automatically
+)
+
+REM Set PowerShell execution policy comprehensively
+echo [INFO] Setting PowerShell execution policy...
+powershell -Command "Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force" 2>nul
+powershell -Command "Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force" 2>nul
 
 if %errorLevel% == 0 (
-    echo [INFO] PowerShell execution policy set successfully
+    echo [INFO] PowerShell execution policy configured successfully
 ) else (
     echo [WARNING] Could not set execution policy automatically
-    echo [INFO] Continuing with bypass method...
+    echo [INFO] Will use bypass method for script execution...
 )
 
 echo.
