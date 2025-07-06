@@ -27,36 +27,43 @@ wsl --install -d Ubuntu-24.04
 Write-Host "Installing Windows applications..." -ForegroundColor Yellow
 
 # Visual Studio Code
-Write-Host "Installing Visual Studio Code..." -ForegroundColor Cyan
-winget install Microsoft.VisualStudioCode
+Write-Host "Installing Visual Studio Code (silent)..." -ForegroundColor Cyan
+winget install Microsoft.VisualStudioCode --silent --accept-source-agreements --accept-package-agreements
+if ($LASTEXITCODE -eq 0) { Write-Host "✓ Visual Studio Code installed successfully" -ForegroundColor Green }
 
 # Git for Windows
-Write-Host "Installing Git for Windows..." -ForegroundColor Cyan
-winget install Git.Git
+Write-Host "Installing Git for Windows (silent)..." -ForegroundColor Cyan
+winget install Git.Git --silent --accept-source-agreements --accept-package-agreements
+if ($LASTEXITCODE -eq 0) { Write-Host "✓ Git for Windows installed successfully" -ForegroundColor Green }
 
 # Terraform
-Write-Host "Installing Terraform..." -ForegroundColor Cyan
-winget install HashiCorp.Terraform
+Write-Host "Installing Terraform (silent)..." -ForegroundColor Cyan
+winget install HashiCorp.Terraform --silent --accept-source-agreements --accept-package-agreements
+if ($LASTEXITCODE -eq 0) { Write-Host "✓ Terraform installed successfully" -ForegroundColor Green }
 
 # Windows Terminal (if not already installed)
-Write-Host "Installing Windows Terminal..." -ForegroundColor Cyan
-winget install Microsoft.WindowsTerminal
+Write-Host "Installing Windows Terminal (silent)..." -ForegroundColor Cyan
+winget install Microsoft.WindowsTerminal --silent --accept-source-agreements --accept-package-agreements
+if ($LASTEXITCODE -eq 0) { Write-Host "✓ Windows Terminal installed successfully" -ForegroundColor Green }
 
 # Docker Desktop (optional but useful)
-Write-Host "Installing Docker Desktop..." -ForegroundColor Cyan
-winget install Docker.DockerDesktop
+Write-Host "Installing Docker Desktop (silent)..." -ForegroundColor Cyan
+winget install Docker.DockerDesktop --silent --accept-source-agreements --accept-package-agreements
+if ($LASTEXITCODE -eq 0) { Write-Host "✓ Docker Desktop installed successfully" -ForegroundColor Green }
 
 # Try to install Claude Code (may not be available yet)
-Write-Host "Attempting to install Claude Code..." -ForegroundColor Cyan
+Write-Host "Attempting to install Claude Code (silent)..." -ForegroundColor Cyan
 try {
-    winget install Anthropic.ClaudeCode
-    Write-Host "Claude Code installed successfully!" -ForegroundColor Green
+    winget install Anthropic.ClaudeCode --silent --accept-source-agreements --accept-package-agreements
+    if ($LASTEXITCODE -eq 0) { Write-Host "✓ Claude Code installed successfully!" -ForegroundColor Green }
 } catch {
     Write-Host "Claude Code not available via winget yet. Check Anthropic's documentation for manual installation." -ForegroundColor Yellow
 }
 
 Write-Host ""
 Write-Host "Windows setup complete!" -ForegroundColor Green
+Write-Host "All applications were installed silently without user interaction." -ForegroundColor Green
+Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Yellow
 Write-Host "1. Restart your computer to complete WSL installation" -ForegroundColor White
 Write-Host "2. After restart, open Windows Terminal" -ForegroundColor White
