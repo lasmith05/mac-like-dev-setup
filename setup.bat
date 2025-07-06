@@ -39,28 +39,46 @@ if %errorLevel% == 0 (
 
 echo.
 echo [INFO] Starting Windows setup script...
+echo [INFO] This will install WSL2, Ubuntu, and Windows applications
+echo [INFO] Some steps require user interaction - please watch for prompts
 echo.
 
 REM Run the PowerShell script with execution policy bypass
+echo [INFO] Executing PowerShell setup script...
 powershell -ExecutionPolicy Bypass -File "%~dp0windows-setup.ps1"
+
+echo.
+echo [INFO] PowerShell script completed with exit code: %errorLevel%
 
 if %errorLevel% == 0 (
     echo.
     echo [SUCCESS] Windows setup completed successfully!
     echo.
-    echo Next steps:
-    echo 1. Restart your computer to complete WSL installation
-    echo 2. After restart, open Windows Terminal and type 'wsl'
-    echo 3. Copy the setup files to Ubuntu and run ubuntu-setup.sh
+    echo [INFO] Checking WSL installation status...
+    wsl --list --verbose
+    
+    echo.
+    echo [INFO] Next steps:
+    echo 1. If WSL installation is pending, restart your computer
+    echo 2. If Ubuntu shows "Stopped", open Windows Terminal and type 'wsl'
+    echo 3. Set up Ubuntu username/password when prompted
+    echo 4. Copy setup files and run ubuntu-setup.sh
+    echo.
+    echo [INFO] WSL Installation Notes:
+    echo - WSL installation may require a restart to complete
+    echo - Ubuntu will prompt for username/password on first run
+    echo - If Ubuntu didn't install, run: wsl --install -d Ubuntu-24.04
 ) else (
     echo.
     echo [ERROR] Setup script encountered an error (Exit Code: %errorLevel%)
     echo.
-    echo Troubleshooting:
+    echo [INFO] Common issues and solutions:
     echo - Make sure you're running as Administrator
     echo - Check your internet connection
-    echo - Try running windows-setup.ps1 directly:
-    echo   PowerShell -ExecutionPolicy Bypass -File windows-setup.ps1
+    echo - Ensure Windows version supports WSL2 (Windows 10 2004+ or Windows 11)
+    echo - Try manual WSL install: wsl --install -d Ubuntu-24.04
+    echo.
+    echo [INFO] For detailed troubleshooting, check the README.md file
 )
 
 echo.

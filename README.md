@@ -89,7 +89,7 @@ The script will automatically:
 ### 5. Final Steps
 
 1. **Restart your terminal** to start using zsh
-2. **Install tmux plugins**: Open tmux and press `Ctrl+a` then `I`
+2. **Install tmux plugins**: Open tmux and press `Ctrl+a` then `Shift+I` (or `Ctrl+b` then `Shift+I` if config not loaded)
 3. **Configure Git**:
    ```bash
    git config --global user.name "Your Name"
@@ -170,11 +170,19 @@ gl          # git log --oneline --graph
 # Start tmux
 tmux
 
-# Key bindings (prefix = Ctrl+a)
-Ctrl+a c    # new window
-Ctrl+a |    # split vertically
-Ctrl+a -    # split horizontally
+# Key bindings (prefix = Ctrl+a, fallback to Ctrl+b if config not loaded)
+Ctrl+a c    # new window (or Ctrl+b c)
+Ctrl+a |    # split vertically (or Ctrl+b |)
+Ctrl+a -    # split horizontally (or Ctrl+b -)
 Ctrl+a h/j/k/l  # navigate panes (vim style)
+
+# Install tmux plugins
+Ctrl+a Shift+I  # install plugins (or Ctrl+b Shift+I)
+
+# If Ctrl+a doesn't work, your tmux config might not be loaded:
+tmux kill-server  # kill all sessions
+tmux              # start fresh
+# Or manually reload: Ctrl+b : source-file ~/.tmux.conf
 
 # Mouse support
 # - Click to switch panes
@@ -230,9 +238,45 @@ set -g @plugin 'plugin-name'
 - Try the PowerShell method as alternative
 
 ### WSL Installation Issues
-- Ensure virtualization is enabled in BIOS
-- Run `wsl --install` manually if needed
-- Check Windows features: "Windows Subsystem for Linux" enabled
+
+**Check WSL Status:**
+```powershell
+# Run in PowerShell as Administrator
+wsl --list --verbose
+wsl --status
+```
+
+**If WSL didn't install:**
+1. **Enable Windows Features manually:**
+   ```powershell
+   dism.exe /online /enable-feature /featurename:Microsoft-Windows-Subsystem-Linux /all /norestart
+   dism.exe /online /enable-feature /featurename:VirtualMachinePlatform /all /norestart
+   ```
+2. **Restart computer**
+3. **Download WSL2 Linux kernel update** from Microsoft
+4. **Set WSL2 as default:**
+   ```powershell
+   wsl --set-default-version 2
+   ```
+5. **Install Ubuntu:**
+   ```powershell
+   wsl --install -d Ubuntu-24.04
+   # Or try: wsl --install Ubuntu
+   ```
+
+**If Ubuntu installed but won't start:**
+- Open Windows Terminal and type `wsl`
+- Or search for "Ubuntu" in Start menu
+- Set up username/password when prompted
+
+**Alternative Installation:**
+- Install Ubuntu directly from Microsoft Store
+- Search for "Ubuntu 24.04 LTS" in Microsoft Store
+
+**Common Requirements:**
+- Windows 10 version 2004+ or Windows 11
+- Virtualization enabled in BIOS/UEFI
+- At least 4GB free disk space
 
 ### Package Installation Fails
 - Run `sudo apt update` first
