@@ -51,6 +51,11 @@ Write-Host "Installing Docker Desktop (silent)..." -ForegroundColor Cyan
 winget install Docker.DockerDesktop --silent --accept-source-agreements --accept-package-agreements
 if ($LASTEXITCODE -eq 0) { Write-Host "✓ Docker Desktop installed successfully" -ForegroundColor Green }
 
+# TeamViewer (remote control)
+Write-Host "Installing TeamViewer (silent)..." -ForegroundColor Cyan
+winget install TeamViewer.TeamViewer --silent --accept-source-agreements --accept-package-agreements
+if ($LASTEXITCODE -eq 0) { Write-Host "✓ TeamViewer installed successfully" -ForegroundColor Green }
+
 Write-Host ""
 Write-Host "Windows setup complete!" -ForegroundColor Green
 Write-Host "All applications were installed silently without user interaction." -ForegroundColor Green
