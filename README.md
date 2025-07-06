@@ -7,6 +7,7 @@ Automated setup scripts to recreate your complete development environment on any
 ### 1. Download All Files
 
 Create a new folder and download these files:
+- `setup.bat` (Easy Windows setup - **recommended**)
 - `windows-setup.ps1` (Windows setup script)
 - `ubuntu-setup.sh` (Ubuntu setup script)
 - `.tmux.conf` (tmux configuration)
@@ -15,6 +16,15 @@ Create a new folder and download these files:
 
 ### 2. Run Windows Setup
 
+**Easy Method (Recommended):**
+1. **Right-click on `setup.bat`**
+2. **Select "Run as administrator"**
+3. **Click "Yes"** when prompted
+4. **Follow the on-screen instructions**
+
+The batch file automatically handles PowerShell execution policy and runs the setup script.
+
+**Alternative Method (PowerShell directly):**
 1. **Run PowerShell as Administrator**
    - Right-click on PowerShell in Start menu
    - Select "Run as Administrator"
@@ -27,16 +37,10 @@ Create a new folder and download these files:
    .\windows-setup.ps1
    ```
 
-**If you get an execution policy error**, try one of these solutions:
-- **Solution 1 (Recommended)**: Make sure you're running as Administrator (the script handles this automatically)
-- **Solution 2**: Set execution policy manually:
-  ```powershell
-  Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-  ```
-- **Solution 3**: Bypass policy for single execution:
-  ```powershell
-  PowerShell -ExecutionPolicy Bypass -File .\windows-setup.ps1
-  ```
+**If you get an execution policy error**, try:
+```powershell
+PowerShell -ExecutionPolicy Bypass -File .\windows-setup.ps1
+```
 
 This will install:
 - WSL 2 with Ubuntu 24.04 LTS
@@ -200,11 +204,17 @@ set -g @plugin 'plugin-name'
 
 ## 🆘 Troubleshooting
 
-### PowerShell Execution Policy Error
-If you get "running scripts is disabled" error:
-- **Make sure you're running PowerShell as Administrator** (recommended)
-- Or run: `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser -Force`
-- Or bypass for single use: `PowerShell -ExecutionPolicy Bypass -File .\windows-setup.ps1`
+### Windows Setup Issues
+
+**PowerShell Execution Policy Error:**
+- **Use `setup.bat` instead** (recommended) - it handles this automatically
+- Or if using PowerShell directly: `PowerShell -ExecutionPolicy Bypass -File .\windows-setup.ps1`
+- Make sure you're running as Administrator
+
+**Setup.bat not working:**
+- Make sure you right-clicked and selected "Run as administrator"
+- Check that all files are in the same folder
+- Try the PowerShell method as alternative
 
 ### WSL Installation Issues
 - Ensure virtualization is enabled in BIOS
