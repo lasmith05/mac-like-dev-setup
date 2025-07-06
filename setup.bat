@@ -43,6 +43,15 @@ echo [INFO] This will install WSL2, Ubuntu, and Windows applications
 echo [INFO] Some steps require user interaction - please watch for prompts
 echo.
 
+REM First-time winget setup - accept source agreements
+echo [INFO] Setting up winget (first-time setup may require agreement acceptance)...
+powershell -Command "winget list > $null 2>&1"
+if %errorLevel% neq 0 (
+    echo [INFO] Please accept winget source agreements when prompted...
+    powershell -Command "winget list"
+    echo [INFO] Agreements accepted. Continuing with silent installations...
+)
+
 REM Run the PowerShell script with execution policy bypass
 echo [INFO] Executing PowerShell setup script...
 powershell -ExecutionPolicy Bypass -File "%~dp0windows-setup.ps1"
