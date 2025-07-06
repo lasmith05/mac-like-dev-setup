@@ -51,15 +51,6 @@ Write-Host "Installing Docker Desktop (silent)..." -ForegroundColor Cyan
 winget install Docker.DockerDesktop --silent --accept-source-agreements --accept-package-agreements
 if ($LASTEXITCODE -eq 0) { Write-Host "✓ Docker Desktop installed successfully" -ForegroundColor Green }
 
-# Try to install Claude Code (may not be available yet)
-Write-Host "Attempting to install Claude Code (silent)..." -ForegroundColor Cyan
-try {
-    winget install Anthropic.ClaudeCode --silent --accept-source-agreements --accept-package-agreements
-    if ($LASTEXITCODE -eq 0) { Write-Host "✓ Claude Code installed successfully!" -ForegroundColor Green }
-} catch {
-    Write-Host "Claude Code not available via winget yet. Check Anthropic's documentation for manual installation." -ForegroundColor Yellow
-}
-
 Write-Host ""
 Write-Host "Windows setup complete!" -ForegroundColor Green
 Write-Host "All applications were installed silently without user interaction." -ForegroundColor Green
