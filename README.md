@@ -57,19 +57,32 @@ After the Windows setup completes, restart your computer to complete WSL install
 
 ### 4. Run Ubuntu Setup
 
+**Automated Method (Recommended):**
 1. **Open Windows Terminal**
 2. **Start WSL**: `wsl`
-3. **Copy the setup files to WSL**:
+3. **Navigate to your setup folder**:
    ```bash
-   # From your Windows folder, copy files to WSL
-   cp /mnt/c/path/to/your/setup/folder/* ~/
+   cd /mnt/c/path/to/your/setup/folder
    ```
-4. **Make the script executable**:
+4. **Make the script executable and run it**:
    ```bash
    chmod +x ubuntu-setup.sh
+   ./ubuntu-setup.sh
    ```
-5. **Run the Ubuntu setup**:
+
+The script will automatically:
+- Detect and copy dotfiles from your Windows folder
+- Install all required packages and tools
+- Configure your development environment
+
+**Manual Method (if auto-detection fails):**
+1. **Copy files manually**:
    ```bash
+   cp /mnt/c/path/to/your/setup/folder/.* ~/
+   ```
+2. **Make script executable and run**:
+   ```bash
+   chmod +x ubuntu-setup.sh
    ./ubuntu-setup.sh
    ```
 

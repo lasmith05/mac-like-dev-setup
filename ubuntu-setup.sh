@@ -6,6 +6,47 @@ set -e  # Exit on any error
 
 echo "🚀 Setting up Ubuntu Development Environment..."
 
+# Function to auto-detect setup files from Windows
+find_setup_files() {
+    local possible_paths=(
+        "/mnt/c/dev-setup"
+        "/mnt/c/Downloads"
+        "/mnt/c/Users/$USER/Downloads" 
+        "/mnt/c/Users/$USER/Desktop"
+        "/mnt/c/Users/$USER/Documents"
+        "$(pwd)"  # Current directory
+    )
+    
+    echo "🔍 Auto-detecting setup files..."
+    
+    for path in "${possible_paths[@]}"; do
+        if [ -f "$path/.tmux.conf" ] && [ -f "$path/.vimrc" ] && [ -f "$path/.zshrc.custom" ]; then
+            echo "✅ Found setup files in: $path"
+            echo "📁 Copying dotfiles to home directory..."
+            
+            # Copy dotfiles to home directory
+            cp "$path/.tmux.conf" "$HOME/" 2>/dev/null || echo "⚠️  Could not copy .tmux.conf"
+            cp "$path/.vimrc" "$HOME/" 2>/dev/null || echo "⚠️  Could not copy .vimrc" 
+            cp "$path/.zshrc.custom" "$HOME/" 2>/dev/null || echo "⚠️  Could not copy .zshrc.custom"
+            
+            echo "✅ Dotfiles copied successfully"
+            return 0
+        fi
+    done
+    
+    echo "⚠️  Could not auto-detect setup files."
+    echo "📝 Please ensure the following files are in your home directory:"
+    echo "   - .tmux.conf"
+    echo "   - .vimrc" 
+    echo "   - .zshrc.custom"
+    echo ""
+    echo "💡 You can copy them manually with:"
+    echo "   cp /mnt/c/path/to/your/setup/files/.* ~/"
+    echo ""
+    read -p "Press Enter to continue if files are already in place, or Ctrl+C to exit..."
+    return 1
+}
+
 # Function to check if command exists
 command_exists() {
     command -v "$1" >/dev/null 2>&1
@@ -30,6 +71,9 @@ if ! grep -q Microsoft /proc/version 2>/dev/null; then
         exit 1
     fi
 fi
+
+# Auto-detect and copy setup files from Windows
+find_setup_files
 
 # Update system
 echo "📦 Updating system packages..."
@@ -97,25 +141,42 @@ fi
 # Set up dotfiles with proper line endings
 echo "📝 Setting up dotfiles..."
 
-# Function to create dotfile with Unix line endings
-create_dotfile() {
+# Function to backup existing file if it exists
+backup_existing_file() {
     local file="$1"
-    local source_file="$2"
     
-    if [ -f "$source_file" ]; then
-        echo "📄 Processing $file..."
-        # Remove Windows line endings and copy
-        tr -d '\r' < "$source_file" > "$file"
-        echo "✅ $file created with Unix line endings"
+    if [ -f "$file" ]; then
+        local backup_file="${file}.backup.$(date +%Y-%m-%d-%H%M%S)"
+        cp "$file" "$backup_file"
+        echo "📄 Backed up existing $file to $backup_file"
+        return 0
+    fi
+    return 1
+}
+
+# Function to ensure dotfile has proper Unix line endings
+ensure_unix_line_endings() {
+    local file="$1"
+    
+    if [ -f "$file" ]; then
+        echo "📄 Processing $file for Unix line endings..."
+        
+        # Create temporary file with Unix line endings
+        local temp_file="${file}.tmp"
+        tr -d '\r' < "$file" > "$temp_file"
+        
+        # Replace original with cleaned version
+        mv "$temp_file" "$file"
+        echo "✅ $file updated with Unix line endings"
     else
-        echo "⚠️  $source_file not found, skipping $file"
+        echo "⚠️  $file not found, skipping line ending conversion"
     fi
 }
 
-# Create dotfiles with proper line endings
-create_dotfile ~/.tmux.conf .tmux.conf
-create_dotfile ~/.vimrc .vimrc
-create_dotfile ~/.zshrc.custom .zshrc.custom
+# Ensure dotfiles have proper Unix line endings
+ensure_unix_line_endings ~/.tmux.conf
+ensure_unix_line_endings ~/.vimrc  
+ensure_unix_line_endings ~/.zshrc.custom
 
 # Verify dotfiles were created
 echo "🔍 Verifying dotfiles..."
@@ -125,9 +186,18 @@ verify_file ~/.zshrc.custom || echo "⚠️  .zshrc.custom not created"
 
 # Add custom zsh config to .zshrc
 if [ -f "$HOME/.zshrc.custom" ]; then
-    echo "" >> ~/.zshrc
-    echo "# Custom configuration" >> ~/.zshrc
-    echo "source ~/.zshrc.custom" >> ~/.zshrc
+    # Check if custom config is already sourced to prevent duplicates
+    if ! grep -q "source ~/.zshrc.custom" ~/.zshrc 2>/dev/null; then
+        # Backup .zshrc before modifying
+        backup_existing_file ~/.zshrc
+        
+        echo "" >> ~/.zshrc
+        echo "# Custom configuration" >> ~/.zshrc
+        echo "source ~/.zshrc.custom" >> ~/.zshrc
+        echo "✅ Added custom zsh configuration to .zshrc"
+    else
+        echo "📄 Custom zsh configuration already present in .zshrc"
+    fi
 fi
 
 # Set zsh as default shell
@@ -199,6 +269,11 @@ echo "4. 🧪 Test your setup:"
 echo "   ls    # Should show colorful output with icons"
 echo "   cat ~/.bashrc  # Should show syntax highlighting"
 echo "   tmux  # Should start with mouse support"
+echo ""
+echo "📁 Backup Information:"
+echo "   Any existing dotfiles were backed up with .backup.[timestamp] extension"
+echo "   To restore a backup: mv ~/.vimrc.backup.[timestamp] ~/.vimrc"
+echo "   To see backups: ls -la ~ | grep backup"
 echo ""
 echo "🛠️  If any items show ❌, you may need to run parts of the setup manually."
 echo "🎯  For issues, check the GitHub repository README for troubleshooting."
